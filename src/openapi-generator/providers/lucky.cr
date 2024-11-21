@@ -5,8 +5,10 @@ require "./base"
 class OpenAPI::Generator::RoutesProvider::Lucky < OpenAPI::Generator::RoutesProvider::Base
   # Return a list of routes mapped with the action classes.
   def route_mappings : Array(RouteMapping)
-    routes = [] of OpenAPI::Generator::RouteMapping
-    ::Lucky.router.list_routes.map do |route|
+    routes = [] of RouteMapping
+    # In the following we `reverse` and `uniq` Lucky routes to filter
+    # out HEAD routes that are automatically generated for GET routes.
+    ::Lucky.router.list_routes.reverse.uniq(&.last).each do |route|
       # A route is a `Tuple` as follows: `{path, method, action}`
       paths, path_params = route[0]
         # Split on /
