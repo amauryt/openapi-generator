@@ -5,9 +5,10 @@ require "./base"
 class OpenAPI::Generator::RoutesProvider::Lucky < OpenAPI::Generator::RoutesProvider::Base
   # Return a list of routes mapped with the action classes.
   def route_mappings : Array(RouteMapping)
-    routes = [] of RouteMapping
-    ::Lucky::Router.routes.map do |route|
-      paths, path_params = route.path
+    routes = [] of OpenAPI::Generator::RouteMapping
+    ::Lucky.router.list_routes.map do |route|
+      # A route is a `Tuple` as follows: `{path, method, action}`
+      paths, path_params = route[0]
         # Split on /
         .split("/")
         # Reformat positional parameters from ":xxx" or "?:xxx" to "{xxx}"
@@ -23,7 +24,7 @@ class OpenAPI::Generator::RoutesProvider::Lucky < OpenAPI::Generator::RoutesProv
             acc
           end
         }
-      routes << {route.method.to_s, paths.join("/"), route.action.to_s, path_params}
+      routes << {route[1].to_s, paths.join("/"), route[2].to_s, path_params}
     end
     routes
   end
