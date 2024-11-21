@@ -69,7 +69,7 @@ module OpenAPI::Generator::Serializable
   # @[OpenAPI::Field(example: "an example value")]
   # property a_field : String
   # ```
-  annotation OpenAPI::Field
+  annotation ::OpenAPI::Field
   end
 
   # A list of all serializable subclasses.
