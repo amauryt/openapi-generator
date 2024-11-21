@@ -16,21 +16,8 @@ dependencies:
     version: ~> 1.3.0
 
 development_dependencies:
-  amber:
-    github: amberframework/amber
-    branch: master
   lucky:
     github: luckyframework/lucky
-    branch: master
-  action-controller:
-    github: spider-gazelle/action-controller
-    branch: master
-  http-params-serializable:
-    github: caspiano/http-params-serializable
-    branch: chore/0.36.0
-  clear:
-    github: place-labs/clear
-  active-model:
-    github: spider-gazelle/active-model
+    version: ~> 1.3.0
 
 license: MIT

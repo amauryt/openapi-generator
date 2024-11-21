@@ -13,7 +13,7 @@ Then serve it from a [Swagger UI](https://swagger.io/tools/swagger-ui/) instance
 ```yaml
 dependencies:
   openapi-generator:
-    github: elbywan/openapi-generator
+    github: amauryt/openapi-generator
 ```
 
 2. Run `shards install`
@@ -119,21 +119,8 @@ OpenAPI::Generator.generate(
 )
 ```
 
-Currently, the [Amber](https://amberframework.org/), [Lucky](https://luckyframework.org), [Spider-gazelle](https://spider-gazelle.net/) providers are included out of the box.
+Currently, only a [Lucky](https://luckyframework.org) provider is included out of the box.
 
-<details><summary><strong>Amber</strong></summary>
-<p>
-
-```crystal
-# Amber provider
-require "openapi-generator/providers/amber"
-
-OpenAPI::Generator.generate(
-  provider: OpenAPI::Generator::RoutesProvider::Amber.new
-)
-```
-
-</p></details>
 
 <details><summary><strong>Lucky</strong></summary>
 <p>
@@ -149,19 +136,6 @@ OpenAPI::Generator.generate(
 
 </p></details>
 
-<details><summary><strong>Spider-gazelle</strong></summary>
-<p>
-
-```crystal
-# Spider-gazelle provider
-require "openapi-generator/providers/action-controller"
-
-OpenAPI::Generator.generate(
-  provider: OpenAPI::Generator::RoutesProvider::ActionController.new
-)
-```
-
-</p></details>
 
 <details><summary><strong>Custom</strong></summary>
 
@@ -323,85 +297,6 @@ end
 
 **Supported Frameworks:**
 
-<details><summary><strong>Amber</strong></summary>
-
-```crystal
-require "openapi-generator/helpers/amber"
-
-# …declare routes and operations… #
-
-# Before calling .generate you need to bootstrap the amber inference:
-OpenAPI::Generator::Helpers::Amber.bootstrap
-```
-
-#### Example
-
-```crystal
-require "openapi-generator/helpers/amber"
-
-class Coordinates
-  include JSON::Serializable
-  extend OpenAPI::Generator::Serializable
-
-  def initialize(@x, @y); end
-
-  property x  : Int32
-  property y  : Int32
-end
-
-class CoordinatesController < Amber::Controller::Base
-  include ::OpenAPI::Generator::Controller
-  include ::OpenAPI::Generator::Helpers::Amber
-
-  @[OpenAPI(
-    <<-YAML
-      summary: Adds up a Coordinate object and a number.
-    YAML
-  )]
-  def add
-    # Infer query parameter.
-    add = query_params("add", description: "Add this number to the coordinates.").to_i32
-    # Infer body as a Coordinate json payload.
-    coordinates = body_as(::Coordinates, description: "Some coordinates").not_nil!
-    coordinates.x += add
-    coordinates.y += add
-
-    # Infer responses.
-    respond_with 200, description: "Returns a Coordinate object with the number added up." do
-      json coordinates, type: ::Coordinates
-      xml %(<coordinate x="#{coordinates.x}" y="#{coordinates.y}"></coordinate>), type: String
-      text "Coordinates (#{coordinates.x}, #{coordinates.y})", type: String
-    end
-  end
-end
-```
-
-#### API
-
-`openapi-generator` overload existing or adds similar methods and macros to intercept calls and infer schema properties.
-
-*Query parameters*
-
-- `macro query_params(name, description, multiple = false, schema = nil, **args)`
-- `macro query_params?(name, description, multiple = false, schema = nil, **args)`
-
-*Body*
-
-- `macro body_as(type, description = nil, content_type = "application/json", constructor = :from_json)`
-
-*Responses*
-
-- `macro respond_with(code = 200, description = nil, headers = nil, links = nil, &)`
-
-- `macro json(body, type = nil, schema = nil)`
-- `macro xml(body, type = nil, schema = nil)`
-- `macro txt(body, type = nil, schema = nil)`
-- `macro text(body, type = nil, schema = nil)`
-- `macro html(body, type = nil, schema = nil)`
-- `macro js(body, type = nil, schema = nil)`
-
-</p></details>
-
 <details><summary><strong>Lucky</strong></summary>
 <p>
 
@@ -486,85 +381,6 @@ end
 </p>
 </details>
 
-<details><summary><strong>Spider-gazelle</strong></summary>
-
-```crystal
-require "openapi-generator/helpers/action-controller"
-
-# …declare routes and operations… #
-
-# Before calling .generate you need to bootstrap the spider-gazelle inference:
-OpenAPI::Generator::Helpers::ActionController.bootstrap
-```
-
-#### Example
-
-```crystal
-require "openapi-generator/helpers/action-controller"
-
-class Coordinates
-  include JSON::Serializable
-  extend OpenAPI::Generator::Serializable
-
-  def initialize(@x, @y); end
-
-  property x  : Int32
-  property y  : Int32
-end
-
-class CoordinatesController < ActionController::Controller::Base
-  include ::OpenAPI::Generator::Controller
-  include ::OpenAPI::Generator::Helpers::ActionController
-
-  @[OpenAPI(
-    <<-YAML
-      summary: Adds up a Coordinate object and a number.
-    YAML
-  )]
-  def add
-    # Infer query parameter.
-    add = param add : Int32, description: "Add this number to the coordinates."
-    # Infer body as a Coordinate json payload.
-    coordinates = body_as(::Coordinates, description: "Some coordinates").not_nil!
-    coordinates.x += add
-    coordinates.y += add
-
-    # Infer responses.
-    respond_with 200, description: "Returns a Coordinate object with the number added up." do
-      json coordinates, type: ::Coordinates
-      xml %(<coordinate x="#{coordinates.x}" y="#{coordinates.y}"></coordinate>), type: String
-      text "Coordinates (#{coordinates.x}, #{coordinates.y})", type: String
-    end
-  end
-end
-```
-
-#### API
-
-`openapi-generator` overload existing or adds similar methods and macros to intercept calls and infer schema properties.
-
-*Query parameters*
-
-- `macro param(declaration, description, multiple = false, schema = nil, **args)`
-
-*Body*
-
-- `macro body_as(type, description = nil, content_type = "application/json", constructor = :from_json)`
-
-*Responses*
-
-- `macro respond_with(code = 200, description = nil, headers = nil, links = nil, &)`
-  - `macro json(body, type = nil, schema = nil)`
-  - `macro xml(body, type = nil, schema = nil)`
-  - `macro txt(body, type = nil, schema = nil)`
-  - `macro text(body, type = nil, schema = nil)`
-  - `macro html(body, type = nil, schema = nil)`
-  - `macro js(body, type = nil, schema = nil)`
-
--  `macro render(status_code = :ok, head = Nop, json = Nop, yaml = Nop, xml = Nop, html = Nop, text = Nop, binary = Nop, template = Nop, partial = Nop, layout = nil, description = nil, headers = nil, links = nil, type = nil, schema = nil)`
-
-</p>
-</details>
 
 ## Swagger UI
 
@@ -591,12 +407,11 @@ To test the project, have a look at the `.travis.yml` file which contains the ri
 
 ```sh
 crystal spec ./spec/core && \
-crystal spec ./spec/amber && \
-crystal spec ./spec/lucky && \
-crystal spec ./spec/spider-gazelle
+crystal spec ./spec/lucky
 ```
 
 ## Contributors
 
-- [elbywan](https://github.com/elbywan) - creator and maintainer
+- [amauryt](https://github.com/elbywan) - fork maintainer
+- [elbywan](https://github.com/elbywan) - original creator and maintainer
 - [dukeraphaelng](https://github.com/dukeraphaelng)
