@@ -18,7 +18,7 @@ module OpenAPI::Generator::Helpers::Lucky
           items: {{type}}.to_openapi_schema,
         ){% else %}{{type}}.to_openapi_schema{% end %},
         description: {{description}},
-        {{**args}}
+        {{args.double_splat}}
       ),
       required: true,
       multiple: {{multiple}}
