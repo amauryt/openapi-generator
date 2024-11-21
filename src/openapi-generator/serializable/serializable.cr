@@ -78,7 +78,7 @@ module OpenAPI::Generator::Serializable
   macro extended
     {% verbatim do %}
     # When extended, add the subtype to the global list.
-    {% OpenAPI::Generator::Serializable::SERIALIZABLE_CLASSES << @type %}
+    {% ::OpenAPI::Generator::Serializable::SERIALIZABLE_CLASSES << @type %}
     {% end %}
   end
 
@@ -87,7 +87,7 @@ module OpenAPI::Generator::Serializable
     macro extended
     {% verbatim do %}
     # When the including subclass is extended, add the subtype to the global list.
-    {% OpenAPI::Generator::Serializable::SERIALIZABLE_CLASSES << @type %}
+    {% ::OpenAPI::Generator::Serializable::SERIALIZABLE_CLASSES << @type %}
     {% end %}
     end
   end
@@ -149,7 +149,7 @@ module OpenAPI::Generator::Serializable
   # :nodoc:
   def self.schemas
     # For every registered class, we get its schema and store it in the schemas.
-    schemas = Hash(String, OpenAPI::Schema | OpenAPI::Reference).new
+    schemas = Hash(String, ::OpenAPI::Schema | ::OpenAPI::Reference).new
     {% for serializable_class in SERIALIZABLE_CLASSES %}
       # Forbid namespace seperator "::" in type name due to being YAML-illegal in plain style (YAML 1.2 - 7.3.3)
       schemas[{{serializable_class.id.split("::").join("_")}}] = {{serializable_class}}.generate_schema
