@@ -1,5 +1,5 @@
 module OpenAPI::Generator::Serializable::Utils
-  macro generate_schema(schema, types, as_type = nil, read_only = false, write_only = false, schema_key = nil, example = nil)
+  macro generate_schema(schema, types, as_type = nil, read_only = false, write_only = false, schema_key = nil, example = nil, description = nil)
     {% serialized_types = [] of {String, (TypeNode | ArrayLiteral(TypeNode))?} %}
     {% nilable = types.any? &.resolve.nilable? %}
 
@@ -83,6 +83,7 @@ module OpenAPI::Generator::Serializable::Utils
           {% if read_only %}  read_only:  {{ read_only }},  {% end %}
           {% if write_only %} write_only: {{ write_only }}, {% end %}
           {% if example != nil %}example: {{ example }},    {% end %}
+          {% if description %}description: {{ description}},{% end %}
         )
       elsif %generated_schema
         {% if schema_key %}{{schema}}.properties.not_nil!["{{schema_key}}"]{% else %}{{schema}}{% end %} = %generated_schema
@@ -141,6 +142,7 @@ module OpenAPI::Generator::Serializable::Utils
             {% if read_only %}  read_only:  {{ read_only }},  {% end %}
             {% if write_only %} write_only: {{ write_only }}, {% end %}
             {% if example != nil %}example: {{ example }},    {% end %}
+            {% if description %}description: {{ description}},{% end %}
           )
         elsif %generated_schema
           %one_of << %generated_schema

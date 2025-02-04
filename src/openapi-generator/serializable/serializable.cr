@@ -113,6 +113,7 @@ module OpenAPI::Generator::Serializable
       {% read_only = openapi_ann && openapi_ann[:read_only] %}
       {% write_only = openapi_ann && openapi_ann[:write_only] %}
       {% example = openapi_ann && openapi_ann[:example] %}
+      {% description = openapi_ann && openapi_ann[:description] %}
 
       {% unless json_ann && json_ann[:ignore] %}
         ::OpenAPI::Generator::Serializable::Utils.generate_schema(
@@ -122,7 +123,8 @@ module OpenAPI::Generator::Serializable
           as_type: {{as_type}},
           read_only: {{read_only}},
           write_only: {{write_only}},
-          example: {{example}}
+          example: {{example}},
+          description: {{description}}
         )
       {% end %}
 
