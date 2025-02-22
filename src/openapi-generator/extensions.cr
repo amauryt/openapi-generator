@@ -183,6 +183,7 @@ module OpenAPI
     setter read_only
     setter write_only
     setter required
+    setter description
   end
 
   # :nodoc:

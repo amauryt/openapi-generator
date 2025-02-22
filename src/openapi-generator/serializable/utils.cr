@@ -46,10 +46,11 @@ module OpenAPI::Generator::Serializable::Utils
       {% if type == "object" %}
         %type = nil
         # Store a reference to another object.
-        {% if read_only || write_only %}
+        {% if read_only || write_only || description %}
         %generated_schema = OpenAPI::Schema.new(
           read_only: {{ read_only }},
           write_only: {{ write_only }},
+          description: {{ description }},
           all_of: [
             OpenAPI::Reference.new ref: "#/components/schemas/#{URI.encode_www_form({{extra.stringify.split("::").join("_")}})}"
           ]
@@ -60,6 +61,9 @@ module OpenAPI::Generator::Serializable::Utils
       {% elsif type == "self_schema" %}
         %type = nil
         %generated_schema = {{extra}}.to_openapi_schema
+        {% if description %}
+        %generated_schema.description = {{ description }}
+        {% end %}
         {% if read_only %}
         %generated_schema.read_only = true
         {% end %}
@@ -142,14 +146,13 @@ module OpenAPI::Generator::Serializable::Utils
             {% if read_only %}  read_only:  {{ read_only }},  {% end %}
             {% if write_only %} write_only: {{ write_only }}, {% end %}
             {% if example != nil %}example: {{ example }},    {% end %}
-            {% if description %}description: {{ description}},{% end %}
           )
         elsif %generated_schema
           %one_of << %generated_schema
         end
       {% end %}
 
-      {% if schema_key %}{{schema}}.properties.not_nil!["{{schema_key}}"]{% else %}{{schema}}{% end %} = OpenAPI::Schema.new(one_of: %one_of)
+      {% if schema_key %}{{schema}}.properties.not_nil!["{{schema_key}}"]{% else %}{{schema}}{% end %} = OpenAPI::Schema.new(one_of: %one_of, description: {{description}})
     {% end %}
   end
 end
